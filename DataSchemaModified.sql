@@ -1,12 +1,12 @@
 CREATE TABLE users (
     user_id INTEGER NOT NULL,
-    username VARCHAR(30) NOT NULL,
+    login VARCHAR(30) NOT NULL,
     password_hash VARCHAR(64) NOT NULL,
     email VARCHAR(100) NOT NULL,
     phone VARCHAR(15),
     user_role VARCHAR(20) NOT NULL,
     CONSTRAINT users_pk PRIMARY KEY (user_id),
-    CONSTRAINT users_username_uq UNIQUE (username),
+    CONSTRAINT users_login_uq UNIQUE (login),
     CONSTRAINT users_email_uq UNIQUE (email),
     CONSTRAINT users_role_ck CHECK (user_role IN ('visitor', 'manager', 'admin'))
 );
@@ -26,12 +26,12 @@ CREATE TABLE restaurants (
 CREATE TABLE tables (
     table_id INTEGER NOT NULL,
     table_number INTEGER NOT NULL,
-    capacity INTEGER NOT NULL,
-    status VARCHAR(10) NOT NULL,
+    seat_capacity INTEGER NOT NULL,
+    table_status VARCHAR(10) NOT NULL,
     restaurant_id INTEGER NOT NULL REFERENCES restaurants (restaurant_id),
     CONSTRAINT tables_pk PRIMARY KEY (table_id),
-    CONSTRAINT tables_capacity_ck CHECK (capacity BETWEEN 1 AND 20),
-    CONSTRAINT tables_status_ck CHECK (status IN ('available', 'blocked')),
+    CONSTRAINT tables_capacity_ck CHECK (seat_capacity BETWEEN 1 AND 20),
+    CONSTRAINT tables_status_ck CHECK (table_status IN ('available', 'blocked')),
     CONSTRAINT tables_number_ck CHECK (table_number > 0)
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE bookings (
     booking_id INTEGER NOT NULL,
     booking_date DATE NOT NULL,
     guests_count INTEGER NOT NULL,
-    status VARCHAR(10) NOT NULL,
+    booking_status VARCHAR(10) NOT NULL,
     qr_code VARCHAR(20) NOT NULL,
     visitor_id INTEGER NOT NULL REFERENCES users (user_id),
     table_id INTEGER NOT NULL REFERENCES tables (table_id),
@@ -58,7 +58,9 @@ CREATE TABLE bookings (
     CONSTRAINT bookings_pk PRIMARY KEY (booking_id),
     CONSTRAINT bookings_qr_uq UNIQUE (qr_code),
     CONSTRAINT bookings_guests_ck CHECK (guests_count BETWEEN 1 AND 20),
-    CONSTRAINT bookings_status_ck CHECK (status IN ('confirmed', 'cancelled', 'completed'))
+    CONSTRAINT bookings_status_ck CHECK (
+        booking_status IN ('confirmed', 'cancelled', 'completed')
+    )
 );
 
 CREATE TABLE demand_metrics (
