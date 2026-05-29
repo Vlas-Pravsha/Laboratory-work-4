@@ -15,4 +15,4 @@ jobs:
         run: npm install --save-dev --save-exact @biomejs/biome
 
       - name: Validate ProgramCode.js
-        run: npx @biomejs/biome check $GITHUB_WORKSPACE/ProgramCode.js
+        run: npx @biomejs/biome check $GITHUB_WORKSPACE/ProgramCodeModified.js
