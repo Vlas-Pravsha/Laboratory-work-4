@@ -5,12 +5,10 @@ CREATE TABLE users (
     user_email VARCHAR(100) NOT NULL,
     user_phone VARCHAR(15),
     access_level VARCHAR(20) NOT NULL,
-    CONSTRAINT users_pk PRIMARY KEY (user_id),
-    CONSTRAINT users_login_uq UNIQUE (user_login),
-    CONSTRAINT users_email_uq UNIQUE (user_email),
-    CONSTRAINT users_level_ck CHECK (
-        access_level IN ('visitor', 'manager', 'admin')
-    )
+    PRIMARY KEY (user_id),
+    UNIQUE (user_login),
+    UNIQUE (user_email),
+    CHECK (access_level IN ('visitor', 'manager', 'admin'))
 );
 
 CREATE TABLE restaurants (
@@ -21,24 +19,20 @@ CREATE TABLE restaurants (
     seat_capacity INTEGER NOT NULL,
     restaurant_info VARCHAR(500),
     manager_id INTEGER NOT NULL,
-    CONSTRAINT restaurants_pk PRIMARY KEY (restaurant_id),
-    CONSTRAINT restaurants_capacity_ck CHECK (
-        seat_capacity BETWEEN 1 AND 1000
-    )
+    PRIMARY KEY (restaurant_id),
+    CHECK (seat_capacity BETWEEN 1 AND 1000)
 );
 
 CREATE TABLE tables (
     table_id INTEGER NOT NULL,
     table_num INTEGER NOT NULL,
     seat_count INTEGER NOT NULL,
-    availability VARCHAR(10) NOT NULL,
+    table_avail VARCHAR(10) NOT NULL,
     restaurant_id INTEGER NOT NULL,
-    CONSTRAINT tables_pk PRIMARY KEY (table_id),
-    CONSTRAINT tables_capacity_ck CHECK (seat_count BETWEEN 1 AND 20),
-    CONSTRAINT tables_availability_ck CHECK (
-        availability IN ('available', 'blocked')
-    ),
-    CONSTRAINT tables_number_ck CHECK (table_num > 0)
+    PRIMARY KEY (table_id),
+    CHECK (seat_count BETWEEN 1 AND 20),
+    CHECK (table_avail IN ('available', 'blocked')),
+    CHECK (table_num > 0)
 );
 
 CREATE TABLE time_slots (
@@ -47,26 +41,24 @@ CREATE TABLE time_slots (
     slot_finish TIME NOT NULL,
     slot_duration INTEGER NOT NULL,
     restaurant_id INTEGER NOT NULL,
-    CONSTRAINT time_slots_pk PRIMARY KEY (slot_id),
-    CONSTRAINT time_slots_duration_ck CHECK (slot_duration = 30),
-    CONSTRAINT time_slots_order_ck CHECK (slot_finish > slot_start_tm)
+    PRIMARY KEY (slot_id),
+    CHECK (slot_duration = 30),
+    CHECK (slot_finish > slot_start_tm)
 );
 
 CREATE TABLE bookings (
     booking_id INTEGER NOT NULL,
     booking_dt DATE NOT NULL,
     guests_count INTEGER NOT NULL,
-    reservation_state VARCHAR(10) NOT NULL,
+    booking_state VARCHAR(10) NOT NULL,
     qr_code VARCHAR(20) NOT NULL,
     visitor_id INTEGER NOT NULL,
     table_id INTEGER NOT NULL,
     slot_id INTEGER NOT NULL,
-    CONSTRAINT bookings_pk PRIMARY KEY (booking_id),
-    CONSTRAINT bookings_qr_uq UNIQUE (qr_code),
-    CONSTRAINT bookings_guests_ck CHECK (guests_count BETWEEN 1 AND 20),
-    CONSTRAINT bookings_state_ck CHECK (
-        reservation_state IN ('confirmed', 'cancelled', 'completed')
-    )
+    PRIMARY KEY (booking_id),
+    UNIQUE (qr_code),
+    CHECK (guests_count BETWEEN 1 AND 20),
+    CHECK (booking_state IN ('confirmed', 'cancelled', 'completed'))
 );
 
 CREATE TABLE demand_metrics (
@@ -76,36 +68,8 @@ CREATE TABLE demand_metrics (
     load_pct NUMERIC(5, 2) NOT NULL,
     booked_count INTEGER NOT NULL,
     restaurant_id INTEGER NOT NULL,
-    CONSTRAINT demand_metrics_pk PRIMARY KEY (metric_id),
-    CONSTRAINT demand_metrics_hour_ck CHECK (hour_of_day BETWEEN 0 AND 23),
-    CONSTRAINT demand_metrics_load_ck CHECK (load_pct BETWEEN 0 AND 100),
-    CONSTRAINT demand_metrics_booked_ck CHECK (booked_count >= 0)
+    PRIMARY KEY (metric_id),
+    CHECK (hour_of_day BETWEEN 0 AND 23),
+    CHECK (load_pct BETWEEN 0 AND 100),
+    CHECK (booked_count >= 0)
 );
-
-ALTER TABLE restaurants
-    ADD CONSTRAINT restaurants_manager_fk
-        FOREIGN KEY (manager_id) REFERENCES users (user_id);
-
-ALTER TABLE tables
-    ADD CONSTRAINT tables_restaurant_fk
-        FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id);
-
-ALTER TABLE time_slots
-    ADD CONSTRAINT time_slots_restaurant_fk
-        FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id);
-
-ALTER TABLE bookings
-    ADD CONSTRAINT bookings_visitor_fk
-        FOREIGN KEY (visitor_id) REFERENCES users (user_id);
-
-ALTER TABLE bookings
-    ADD CONSTRAINT bookings_table_fk
-        FOREIGN KEY (table_id) REFERENCES tables (table_id);
-
-ALTER TABLE bookings
-    ADD CONSTRAINT bookings_slot_fk
-        FOREIGN KEY (slot_id) REFERENCES time_slots (slot_id);
-
-ALTER TABLE demand_metrics
-    ADD CONSTRAINT demand_metrics_restaurant_fk
-        FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id);
