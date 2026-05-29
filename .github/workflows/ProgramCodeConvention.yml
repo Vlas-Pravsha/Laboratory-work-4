@@ -1,0 +1,18 @@
+name: JavaScript Program Code Linter
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  JavaScriptCodeLinter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code in Repository
+        uses: actions/checkout@v3
+
+      - name: Install Biome JS Linter
+        run: npm install --save-dev --save-exact @biomejs/biome
+
+      - name: Validate ProgramCode.js
+        run: npx @biomejs/biome check $GITHUB_WORKSPACE/ProgramCode.js
