@@ -24,4 +24,4 @@ jobs:
 
           pip install sqlfluff
 
-          sqlfluff lint $GITHUB_WORKSPACE/DataSchema.sql --dialect ansi
+          sqlfluff lint $GITHUB_WORKSPACE/DataSchemaModified.sql --dialect ansi
