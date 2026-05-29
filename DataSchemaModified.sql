@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE userss (
     user_id INTEGER NOT NULL,
     user_login VARCHAR(30) NOT NULL,
     pwd_hash VARCHAR(64) NOT NULL,
